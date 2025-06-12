@@ -1,13 +1,15 @@
 FROM golang:1.24 AS builder
 
-WORKDIR /app
+WORKDIR /temp
 
 COPY . .
 
 RUN go build -o main .
+# RUN go GOOS=linux build -o main .
 
 FROM gcr.io/distroless/base
 
-COPY --from=builder /app/main .
+WORKDIR /app
+COPY --from=builder /temp/main .
 
-CMD ["/main"]
+CMD ["./main"]
