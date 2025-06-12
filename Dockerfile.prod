@@ -1,15 +1,22 @@
 FROM golang:1.24 AS builder
 
-WORKDIR /temp
+WORKDIR /app
 
 COPY . .
 
-# RUN go build -o server .
-RUN GOOS=linux go build -ldflags="-w -s" -o server .
+# RUN go build -o server . //simplest alternative
+# Use -ldflags="-w -s" to reduce binary size - DWARF
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o server .
 
-FROM gcr.io/distroless/base
+# Use distroless base image for production
+# FROM gcr.io/distroless/base 
+
+# Using scratch required CGO_ENABLED=0
+# The binary generated for the image ended up with 5.48MB size
+# Using distroless/base resulted in a 26.2MB image size
+FROM scratch
 
 WORKDIR /app
-COPY --from=builder /temp/server .
+COPY --from=builder /app/server .
 
 CMD ["./server"]
