@@ -3,8 +3,16 @@ kind: Service
 metadata:
   name: server
 spec:
+  type: LoadBalancer #seems like that in Kind, this is not supported
+  # In a real cluster, you might use NodePort or LoadBalancer
   selector:
     app: server
   ports:
   - port: 8081
     targetPort: 8080
+
+# Note: In a real cluster, you might need to specify the nodePort if using NodePort type
+  # or the loadBalancerIP if using LoadBalancer type.
+  # For example:
+  # nodePort: 30001
+  # loadBalancerIP: "

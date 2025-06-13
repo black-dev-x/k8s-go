@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: server
 spec:
-  replicas: 3
+  replicas: 5 # useless when using Kind, but useful in a real cluster
   selector:
     matchLabels:
       app: server
@@ -14,6 +14,7 @@ spec:
     spec:
       containers:
       - name: server
+      
         image: blackdevx/k8s-go:latest
         resources:
           requests:
@@ -24,3 +25,27 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 8080
+        startupProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 15
+          failureThreshold: 3
+
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
